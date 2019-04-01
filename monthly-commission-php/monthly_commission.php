@@ -86,9 +86,9 @@ function loansCredits($store)
 {
     return array(
         "1" => array(
-            "id" => 1,
+            "id"          => 1,
             "productName" => "vay tín dụng 1",
-            "cpqlValue" => 20,
+            "cpqlValue"   => 20,
             ""
         ),
         
@@ -107,41 +107,47 @@ function loadDbConnectionInfo($store)
 }
 function countContracts($store)
 {
-    $mongo = new MongoDB\Driver\Manager("mongodb://localhost:27017/test");
+    $mongo              = new MongoDB\Driver\Manager("mongodb://localhost:27017/test");
+    $dbConnectionInfo   = loadDbConnectionInfo($store);
 
-    $Created = ["createdAt"=>1];
-    $queryCreated = new \MongoDB\Driver\Query($Created);
-    $dateTimeQuery = date("Y-m-d", strtotime($queryCreated));
+    $moClient           = MongoClient($dbConnectionInfo['DATABASE_CONNECTION']);
+    $database           = $moClient[$dbConnectionInfo['DATABASE_NAME']];
+    $contracts          = $database[$dbConnectionInfo['DATABASE_CONNECTION']];
+
+    $queryParams        = store['OPWIRE_REQUEST']['query'];
+    $userId             = $queryParams["userId"][0];
+    $month              = $queryParams["month"][0];
+
+    $dateTimeQuery      = date("Y-m-d", strtotime($month));
     $dateTimeQueryStart = date("Y-m-01", strtotime($dateTimeQuery));
-    $dateTimeQueryEnd = date("Y-m-t", strtotime($dateTimeQuery));
+    $dateTimeQueryEnd   = date("Y-m-t", strtotime($dateTimeQuery));
 
-    $filter  = array();
-    $Options = array(
-    "projection" => array("userId" => 1, 'createdAt'=> ['$lte'=> $dateTimeQueryEnd, '$gte'=> $dateTimeQueryStart])
-    );
+    $filter             = array("userId" => $userId, 'createdAt'=> ['$lte'=> $dateTimeQueryEnd, '$gte'=> $dateTimeQueryStart]);
+    $options            = array();
 
-    $query = new \MongoDB\Driver\Query($filter,$Options);
-    $rows   = $mongo->executeQuery('test.contracts', $query);
-    $count = '';
+    $query              = new \MongoDB\Driver\Query($filter,$options);
+    $rows               = $mongo->executeQuery('test.contracts', $query);
+    $count              = '';
     foreach ($rows as $document) {
     $document = json_decode(json_encode($document), true);
-    $count = count($document);
+    $count = $contracts->count($document);
     // echo "$document->userId : $document->contractCode : $document->createdAt \n ";
     }
-    echo 'Dem duoc la'.$count;
+    return $count;
 }
+
 function calculator($store)
 {
-    $contractQuatityMonth = countContracts($store);
+    $contractQuatityMonth      = countContracts($store);
     $totalNoInsuaranceContract = $contractQuatityMonth["totalNoInsurance"];
-    $totalInsuaranceContract = $contractQuatityMonth["totalInsurance"];
-    $totalContracts = $totalNoInsuaranceContract + $totalInsuaranceContract;
+    $totalInsuaranceContract   = $contractQuatityMonth["totalInsurance"];
+    $totalContracts            = $totalNoInsuaranceContract + $totalInsuaranceContract;
     
-    $formulas = loadFormular($store);
-    $commissionFormulars = $formulas["monthlyCommission"];
-    $boundFormular = $formulas["bound"];
+    $formulas                  = loadFormular($store);
+    $commissionFormulars       = $formulas["monthlyCommission"];
+    $boundFormular             = $formulas["bound"];
 
-    $condition = null;
+    $condition                 = null;
     foreach ($commissionFormulars as $formula) 
     {
         if($formula['min'] <= $totalContracts && $formula['max'] >= $totalContracts)
@@ -150,7 +156,7 @@ function calculator($store)
             break;
         }
     }
-    $commission = 0;
+    $commission  = 0;
     $commission += $condition['unitNoInsurance']*$totalNoInsuaranceContract;
     $commission += $condition['unitInsurance']*$totalInsuaranceContract; 
     $commission += $condition['fixCommission'];
