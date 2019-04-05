@@ -92,7 +92,7 @@ function loadFormular($store)
 
 function loadDbConnectionInfo($store)
 {
-    $databaseConnectionUrl = empty($store["OPWIRE_SETTINGS_MONGODB_URL"])?"mongodb://localhost:27017":$store["OPWIRE_SETTINGS_MYSQL_URL"];
+    $databaseConnectionUrl = $store["OPWIRE_SETTINGS"]["MONGODB_URL"];
     return $databaseConnectionUrl;
 }
 
@@ -107,8 +107,8 @@ function countContracts($store)
 
     $start = new MongoDB\BSON\UTCDateTime(strtotime($dateTimeQueryStart)*1000);
     $end = new MongoDB\BSON\UTCDateTime(strtotime($dateTimeQueryEnd)*1000);
-
-    $client = new MongoDB\Client(loadDbConnectionInfo($store));
+    $mongodbURL = loadDbConnectionInfo($store);
+    $client = new MongoDB\Client($mongodbURL);
     $collection = $client->test->contracts;
 
     $insuaranceContract = $collection->count(
@@ -147,7 +147,7 @@ function countContracts($store)
         ]
     );
 
-    $totalContracts = $insuaranceContract + $noInsuaranceContract + $insuaranceGreyContract + $noInsuaranceGreyContract; 
+    $totalContracts = $insuaranceContract + $noInsuaranceContract; 
 
     return array(
         "totalContracts" => $totalContracts,
@@ -162,8 +162,7 @@ function calcMonthlyCommision($store)
 {
     // Prepare Paramater
     $contractQuatityMonth = countContracts($store);
-
-    $totalContracts = $contractQuatityMonth["totalContacts"];
+    $totalContracts = $contractQuatityMonth["totalContracts"];
     $totalInsuaranceContract = $contractQuatityMonth["insuaranceContract"];
     $totalNoInsuaranceContract = $contractQuatityMonth["noInsuaranceContract"];
     $totalInsuaranceGreyContract = $contractQuatityMonth["insuaranceGreyContract"];
@@ -174,26 +173,29 @@ function calcMonthlyCommision($store)
     $boundFormular             = $formulas["bound"];
 
     // Main Calculate
-    $condition                 = null;
+    $condition                 = '';
     foreach ($commissionFormulars as $formula) 
     {
-        if($formula['min'] <= $totalContracts && $formula['max'] >= $totalContracts)
-        {
+         if($formula['min'] <= $totalContracts && $formula['max'] >= $totalContracts)
+         {
             $condition = $formula;
             break;
-        }
+         }
     }
+
     $commission  = 0;
-    $commission += $condition['unitNoInsurance'] * $totalNoInsuaranceContract;
-    $commission += $condition['unitInsurance'] * $totalInsuaranceContract; 
     $commission += $condition['fixCommission'];
-    if($condition['compensateNoInsuarance'] == $totalNoInsuaranceContract)
+    
+    if($totalNoInsuaranceContract >= 1)
     {
         $commission += $condition['compensateNoInsuarance'] * $totalNoInsuaranceContract;
+        $commission += $condition['unitNoInsurance'] * $totalNoInsuaranceContract;
     }
-    if($condition['compensateInsuarance'] == $totalInsuaranceContract)
+
+    if($totalInsuaranceContract >= 1)
     {
         $commission += $condition['compensateInsuarance'] * $totalInsuaranceContract;
+        $commission += $condition['unitInsurance'] * $totalInsuaranceContract;
     }
 
     if($commission < $boundFormular['min'])

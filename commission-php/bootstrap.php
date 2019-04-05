@@ -3,11 +3,14 @@
 function bootstrap($args) {
   $store = array();
 
-  foreach (array("OPWIRE_EDITION", "OPWIRE_REQUEST", "OPWIRE_SETTING") as $envName) {
+  foreach (array("OPWIRE_EDITION", "OPWIRE_REQUEST", "OPWIRE_SETTINGS") as $envName) {
     if (array_key_exists($envName, $_SERVER)) {
       $data = $_SERVER[$envName];
       if (is_string($data) && strlen($data) > 0) {
         $store[$envName] = json_decode($data, true);
+        if (json_last_error() != JSON_ERROR_NONE) {
+          $store[$envName] = $data;
+        }
       }
     }
   }
