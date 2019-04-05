@@ -2,7 +2,7 @@
 
 include(dirname(__FILE__) . "/bootstrap.php");
 include(dirname(__FILE__) . "/cmdargs.php");
-include(dirname(__FILE__) . "/monthly_commission.php");
+// include(dirname(__FILE__) . "/monthly_commission.php");
 require dirname(__FILE__ ). '/vendor/autoload.php';
 
 use Monolog\Logger;

@@ -90,8 +90,7 @@ function loansCredits($store)
             "productName" => "vay tín dụng 1",
             "cpqlValue"   => 20,
             ""
-        ),
-        
+        )   
     );
 }
 
