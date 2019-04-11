@@ -147,7 +147,7 @@ function countContracts($store)
         ]
     );
 
-    $totalContracts = $insuaranceContract + $noInsuaranceContract; 
+    $totalContracts = $insuaranceContract + $noInsuaranceContract + $insuaranceGreyContract + $noInsuaranceGreyContract; 
 
     return array(
         "totalContracts" => $totalContracts,
@@ -162,6 +162,7 @@ function calcMonthlyCommision($store)
 {
     // Prepare Paramater
     $contractQuatityMonth = countContracts($store);
+    //var_dump($contractQuatityMonth);
     $totalContracts = $contractQuatityMonth["totalContracts"];
     $totalInsuaranceContract = $contractQuatityMonth["insuaranceContract"];
     $totalNoInsuaranceContract = $contractQuatityMonth["noInsuaranceContract"];
@@ -206,7 +207,7 @@ function calcMonthlyCommision($store)
         $commission = $boundFormular['max'];
     }
 
-    $store["body"] = [
+    $store = [
         "commission" => $commission
     ];
     
