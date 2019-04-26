@@ -118,7 +118,7 @@ function calcMonthlyCommision($store)
     $commission += $condition['compensateGreyInsuarance'] * $totalInsuaranceGreyContract;
     $commission += $condition['compensateGreyNoInsuarance'] * $totalNoInsuaranceGreyContract;
     $commission += $condition['fixCommission'];
-    //var_dump($condition['unitNoInsuarance']);
+    //var_dump($commission);
     if($commission < $boundFormular['min'])
     {
         $commission = $boundFormular['min'];

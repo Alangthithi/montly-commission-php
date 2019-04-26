@@ -86,7 +86,6 @@ function calcMonthlyCommision($store)
 {
     // Prepare Paramater
     $contractQuatityMonth = countContracts($store);
-    //var_dump($contractQuatityMonth);
     $totalContracts = $contractQuatityMonth["totalContracts"];
     $totalInsuaranceContract = $contractQuatityMonth["insuaranceContract"];
     $totalNoInsuaranceContract = $contractQuatityMonth["noInsuaranceContract"];
@@ -113,6 +112,7 @@ function calcMonthlyCommision($store)
     $commission += $condition['unitInsurance'] * $totalInsuaranceContract;
     $commission += $condition['unitGreyInsuarance'] * $totalInsuaranceGreyContract;
     $commission += $condition['unitGreyNoInsuarance'] * $totalNoInsuaranceGreyContract;
+    
     if($commission < $boundFormular['min'])
     {
         $commission = $boundFormular['min'];

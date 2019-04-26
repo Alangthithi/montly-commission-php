@@ -1,0 +1,69 @@
+testcases:
+- title: 14 hợp đồng trong khoảng min max
+  request:
+    method: GET
+    url: http://localhost:8888/run?=
+    headers:
+    - name: content-type
+      value: application/json
+    - name: opwire-execution-timeout
+      value: 0.5s
+    - name: opwire-request-id
+      value: 123456-7890-1234-567890123
+    body: |-
+      {
+      "userId" : "001",
+      "month" : "2019-02",
+      "applicationNumber":"APPL00120681",
+      "greyConvertUnit": 4
+      }
+  expectation:
+    status-code:
+      is-equal-to: 200
+    headers:
+      has-total: 4
+      items:
+      - name: Content-Type
+        is-equal-to: text/plain
+      - name: Content-Length
+        is-equal-to: "30"
+    body:
+      has-format: json
+      includes: |-
+        {
+          "commission": 12940000
+        }
+- title: trong khoảng min
+  request:
+    method: GET
+    url: http://localhost:8888/run?=
+    headers:
+    - name: content-type
+      value: application/json
+    - name: opwire-execution-timeout
+      value: 0.5s
+    - name: opwire-request-id
+      value: 123456-7890-1234-567890123
+    body: |-
+      {
+      "userId" : "001",
+      "month" : "2019-02",
+      "applicationNumber":"ABC",
+      "greyConvertUnit": 4
+      }
+  expectation:
+    status-code:
+      is-equal-to: 200
+    headers:
+      has-total: 4
+      items:
+      - name: Content-Type
+        is-equal-to: text/plain
+      - name: Content-Length
+        is-equal-to: "29"
+    body:
+      has-format: json
+      includes: |-
+        {
+          "commission": 5300000
+        }
