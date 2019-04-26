@@ -6,8 +6,6 @@ testcases:
     headers:
     - name: content-type
       value: application/json
-    - name: opwire-execution-timeout
-      value: 0.5s
     - name: opwire-request-id
       value: 123456-7890-1234-567890123
     body: |-
@@ -21,10 +19,7 @@ testcases:
     status-code:
       is-equal-to: 200
     headers:
-      has-total: 4
       items:
-      - name: Content-Length
-        is-equal-to: "23"
       - name: Content-Type
         is-equal-to: text/plain
     body:
@@ -72,39 +67,43 @@ testcases:
           "commission": 13987000
         }
 
-# - title: trường hợp lớn hơn max (17 14 2 1 1)
-#   request:
-#     method: GET
-#     url: http://localhost:8888/run?=
-#     headers:
-#     - name: content-type
-#       value: application/json
-#     - name: opwire-execution-timeout
-#       value: 0.5s
-#     - name: opwire-request-id
-#       value: 123456-7890-1234-567890123
-#     body: |-
-#       {
-#       "userId" : "001",
-#       "month" : "2019-02",
-#       "applicationNumber":"APPL00120681",
-#       "greyConvertUnit": 4
-#       }
-#   expectation:
-#     status-code:
-#       is-equal-to: 200
-#     headers:
-#       has-total: 4
-#       items:
-#       - name: Content-Type
-#         is-equal-to: text/plain
-#       - name: Content-Length
-#         is-equal-to: "30"
-#     body:
-#       has-format: json
-#       includes: |-
-#         {
-#           "commission": 20000000
-#         }
+- title: trường hợp lớn hơn max (17 14 2 1 1)
+  version: 1.0.4
+  request:
+    method: GET
+    url: http://localhost:8888/run?=
+    headers:
+    - name: content-type
+      value: application/json
+    - name: opwire-execution-timeout
+      value: 0.5s
+    - name: opwire-request-id
+      value: 123456-7890-1234-567890123
+    body: |-
+      {
+      "userId" : "001",
+      "month" : "2019-02",
+      "applicationNumber":"ABCD",
+      "greyConvertUnit": 4
+      }
+  expectation:
+    status-code:
+      is-equal-to: 200
+      belongs-to:
+      - 200
+    headers:
+      total:
+        is-equal-to: 4
+        is-gte: 1
+      items:
+      - name: Content-Type
+        is-equal-to: text/plain
+    body:
+      has-format: json
+      includes: |-
+        {
+          "commission": 20000000
+        }
+
 
 

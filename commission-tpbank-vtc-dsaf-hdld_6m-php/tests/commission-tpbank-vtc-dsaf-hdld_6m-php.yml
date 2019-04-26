@@ -35,6 +35,7 @@ testcases:
         }
 
 - title: 14 hợp đồng trong khoảng min max
+  version: 1.0.4
   request:
     method: GET
     url: http://localhost:8888/run?=
@@ -55,16 +56,57 @@ testcases:
   expectation:
     status-code:
       is-equal-to: 200
+      belongs-to:
+      - 200
     headers:
-      has-total: 4
+      total:
+        is-equal-to: 4
+        is-gte: 1
       items:
       - name: Content-Type
         is-equal-to: text/plain
-      - name: Content-Length
-        is-equal-to: "30"
     body:
       has-format: json
       includes: |-
         {
-          "commission": 13940000
+          "commission": 7428000
         }
+
+- title: Trong khoảng max(22 15 6 1 1)
+  version: 1.0.4
+  request:
+    method: GET
+    url: http://localhost:8888/run?=
+    headers:
+    - name: content-type
+      value: application/json
+    - name: opwire-execution-timeout
+      value: 0.5s
+    - name: opwire-request-id
+      value: 123456-7890-1234-567890123
+    body: |-
+      {
+      "userId" : "001",
+      "month" : "2019-02",
+      "applicationNumber":"ABCD",
+      "greyConvertUnit": 4
+      }
+  expectation:
+    status-code:
+      is-equal-to: 200
+      belongs-to:
+      - 200
+    headers:
+      total:
+        is-equal-to: 4
+        is-gte: 1
+      items:
+      - name: Content-Type
+        is-equal-to: text/plain
+    body:
+      has-format: json
+      includes: |-
+        {
+          "commission": 20000000
+        }
+

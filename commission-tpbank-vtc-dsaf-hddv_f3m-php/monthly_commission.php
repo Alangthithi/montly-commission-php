@@ -86,7 +86,6 @@ function calcMonthlyCommision($store)
 {
     // Prepare Paramater
     $contractQuatityMonth = countContracts($store);
-    //var_dump($contractQuatityMonth);
     $totalContracts = $contractQuatityMonth["totalContracts"];
     $totalInsuaranceContract = $contractQuatityMonth["insuaranceContract"];
     $totalNoInsuaranceContract = $contractQuatityMonth["noInsuaranceContract"];
